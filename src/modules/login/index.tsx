@@ -61,19 +61,19 @@ export default function LoginPage() {
   };
 
 
-  // if (isAuthenticated) {
-  //   return (
-  //     <Box display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
-  //       <Paper sx={{ p: 4, width: 420, textAlign: 'center' }}>
-  //         <Typography variant="h5" mb={2}>✅ Already Logged In</Typography>
-  //         <Typography variant="body1" mb={3}>
-  //           Redirecting you to your notes...
-  //         </Typography>
+  if (isAuthenticated) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="70vh">
+        <Paper sx={{ p: 4, width: 420, textAlign: 'center' }}>
+          <Typography variant="h5" mb={2}>✅ Already Logged In</Typography>
+          <Typography variant="body1" mb={3}>
+            Redirecting you to your notes...
+          </Typography>
           
-  //       </Paper>
-  //     </Box>
-  //   );
-  // }
+        </Paper>
+      </Box>
+    );
+  }
 
   return (
     <Box display="flex" justifyContent="center" backgroundColor="#64b5f6" alignItems="center" minHeight="100vh">
