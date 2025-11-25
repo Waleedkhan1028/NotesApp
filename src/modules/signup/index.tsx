@@ -11,67 +11,98 @@ import RHFTextField from "../_core/components/form/RHFTextField";
 import RHFButton from "../_core/components/button/RHFButton";
 import { signupSchema, SignupFormData } from "../../lib/schemas";
 import { useSnackbar } from "../../context/SnackbarContext";
+
 export default function SignupPage() {
   const router = useRouter();
-    const { showSnackbar } = useSnackbar(); 
+  const { showSnackbar } = useSnackbar();
 
-  const { control, handleSubmit, formState: { errors, isValid } } = useForm<SignupFormData>({
+  const { control, handleSubmit, formState: { isValid } } = useForm<SignupFormData>({
     resolver: yupResolver(signupSchema),
-    defaultValues: { 
-      username: "", 
-      email: "", 
-      password: "" 
+    defaultValues: {
+      username: "",
+      email: "",
+      password: ""
     },
-    mode: "onChange", 
+    mode: "onChange",
   });
 
- 
   const signupMutation = useSignup();
 
   const onSubmit: SubmitHandler<SignupFormData> = (data) => {
-
     signupMutation.mutate(data, {
       onSuccess: (response) => {
-         
         showSnackbar(response.message || "Signup successful!", "success");
         router.push("/login");
       },
-      onError: (error:any) => {
-           showSnackbar(error?.response?.data?.message || "Signup failed!", "error");
+      onError: (error: any) => {
+        showSnackbar(error?.response?.data?.message || "Signup failed!", "error");
       },
     });
   };
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" backgroundColor="#64b5f6" minHeight="100vh">
-      <Paper sx={{ p: 4, width: 420 }}>
-        <Typography variant="h5" mb={2}>
-          Sign Up
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #2a1a3a 100%)',
+        padding: 2,
+      }}
+    >
+      <Paper
+        elevation={0}
+        sx={{
+          p: 5,
+          width: '100%',
+          maxWidth: 440,
+          borderRadius: 4,
+          background: 'rgba(255, 255, 255, 0.05)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+        }}
+        className="animate-slide-in"
+      >
+        <Typography
+          variant="h4"
+          mb={1}
+          sx={{
+            background: 'linear-gradient(135deg, #90caf9 0%, #f48fb1 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontWeight: 700,
+          }}
+        >
+          Create Account
         </Typography>
+        <Typography variant="body2" color="text.secondary" mb={4}>
+          Join us to start organizing your notes
+        </Typography>
+
         <form onSubmit={handleSubmit(onSubmit)}>
-          <RHFTextField 
-            name="username" 
-            control={control} 
-            label="Username" 
-           
+          <RHFTextField
+            name="username"
+            control={control}
+            label="Username"
           />
-          <Box mt={2} />
-          <RHFTextField 
-            name="email" 
-            control={control} 
-            label="Email" 
+          <Box mt={3} />
+          <RHFTextField
+            name="email"
+            control={control}
+            label="Email"
             type="email"
-    
           />
-          <Box mt={2} />
-          <RHFTextField 
-            name="password" 
-            control={control} 
-            label="Password" 
+          <Box mt={3} />
+          <RHFTextField
+            name="password"
+            control={control}
+            label="Password"
             type="password"
-       
           />
-          <Box mt={2} display="flex" justifyContent="flex-end">
+          <Box mt={4} display="flex" justifyContent="flex-end">
             <RHFButton
               type="submit"
               label={signupMutation.isPending ? "Creating account..." : "Create Account"}
@@ -79,17 +110,22 @@ export default function SignupPage() {
             />
           </Box>
         </form>
-        
-        <Box mt={3} textAlign="center">
-          <Typography variant="body2">
+
+        <Box mt={4} textAlign="center">
+          <Typography variant="body2" color="text.secondary">
             Already have an account?{" "}
-            <Link 
-              component={NextLink} 
-              href="/login" 
+            <Link
+              component={NextLink}
+              href="/login"
               underline="hover"
-              sx={{ 
+              sx={{
                 cursor: 'pointer',
-                fontWeight: 'medium'
+                fontWeight: 600,
+                color: 'primary.main',
+                transition: 'color 0.3s',
+                '&:hover': {
+                  color: 'primary.light',
+                },
               }}
             >
               Sign In

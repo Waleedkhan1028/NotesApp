@@ -47,9 +47,5 @@ export class SignupRepository {
     });
   }
 
-  // You can remove isValidEmail since Yup handles email validation
-  // private static isValidEmail(email: string): boolean {
-  //   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  //   return emailRegex.test(email);
-  // }
+
 }

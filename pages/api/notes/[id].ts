@@ -1,12 +1,12 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { getUserIdFromToken } from "../../../src/lib/auth";
-import { NotesRepository } from "../../../src/api/Repositries/notes/index";
+import { NotesRepository } from "../../../src/api/Repositories/notes/index";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { id } = req.query;
   const token = req.cookies.token;
   const userId = getUserIdFromToken(token);
-  
+
   if (!userId) {
     return res.status(401).json({ message: "Unauthorized" });
   }
@@ -25,19 +25,19 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       case 'PUT':
         const { title, content, category, priority, tags } = req.body;
 
-        const validationError = await NotesRepository.validateNoteData({ 
-          title, content, category, priority 
+        const validationError = await NotesRepository.validateNoteData({
+          title, content, category, priority
         });
         if (validationError) {
           return res.status(400).json({ message: validationError });
         }
 
         const updatedNote = await NotesRepository.updateNote(
-          id as string, 
-          userId, 
-          { title, content, category, priority, tags: tags || [],   updatedAt: new Date(),}
+          id as string,
+          userId,
+          { title, content, category, priority, tags: tags || [], updatedAt: new Date(), }
         );
-        
+
         return res.status(200).json(updatedNote);
 
       case 'DELETE':

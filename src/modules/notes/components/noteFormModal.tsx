@@ -1,12 +1,16 @@
 "use client";
 import React from "react";
-import {TextField,Button,Box,Stack,IconButton,FormControl,InputLabel,Select,MenuItem,FormControlLabel,Radio,RadioGroup,FormLabel,FormGroup,Typography, Modal,} from "@mui/material";
-import Checkbox from '@mui/material/Checkbox';
+import { Button, Box, Stack, IconButton, Typography, Modal } from "@mui/material";
 import { Close } from "@mui/icons-material";
 import { useForm } from "react-hook-form";
 import { yupResolver } from '@hookform/resolvers/yup';
 import { noteSchema, NoteFormData } from "../../../lib/schemas";
 import { CATEGORY_OPTIONS, PRIORITY_OPTIONS, TAG_OPTIONS } from "../lib/constants";
+import RHFTextField from "../../_core/components/form/RHFTextField";
+import RHFSelect from "../../_core/components/form/RHFSelect";
+import RHFRadioGroup from "../../_core/components/form/RHFRadioGroup";
+import RHFCheckboxGroup from "../../_core/components/form/RHFCheckbox";
+import RHFTextarea from "../../_core/components/form/RHFTextArea";
 
 interface NoteFormModalProps {
   open: boolean;
@@ -18,8 +22,8 @@ interface NoteFormModalProps {
   initialValues?: Partial<NoteFormData>;
 }
 
-export default function NoteFormModal({open, editing, isLoading, onClose, onSubmit, onCancel, initialValues}: NoteFormModalProps) {
-  const { register, handleSubmit, reset, setValue, watch, formState: { errors, isValid } } = useForm<NoteFormData>({
+export default function NoteFormModal({ open, editing, isLoading, onClose, onSubmit, onCancel, initialValues }: NoteFormModalProps) {
+  const { control, handleSubmit, formState: { isValid } } = useForm<NoteFormData>({
     resolver: yupResolver(noteSchema),
     defaultValues: {
       title: "",
@@ -28,20 +32,9 @@ export default function NoteFormModal({open, editing, isLoading, onClose, onSubm
       priority: "medium",
       tags: [],
       ...initialValues
-    }
+    },
+    mode: "onChange"
   });
-
-
-  
-
-  const handleTagChange = (tagValue: string) => {
-    const currentTags = watch('tags');
-    const newTags = currentTags.includes(tagValue)
-      ? currentTags.filter(tag => tag !== tagValue)
-      : [...currentTags, tagValue];
-    
-    setValue('tags', newTags);
-  };
 
   const handleFormSubmit = (data: NoteFormData) => {
     onSubmit(data);
@@ -60,17 +53,21 @@ export default function NoteFormModal({open, editing, isLoading, onClose, onSubm
           left: '50%',
           transform: 'translate(-50%, -50%)',
           width: '90%',
-          maxWidth: 600,
+          maxWidth: 650,
           maxHeight: '90vh',
           overflow: 'auto',
           bgcolor: 'background.paper',
-          boxShadow: 24,
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
           p: 4,
-          borderRadius: 2,
+          borderRadius: 3,
+          backdropFilter: 'blur(20px)',
+          background: 'rgba(255, 255, 255, 0.05)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          animation: 'fadeIn 0.3s ease-out',
         }}
       >
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
-          <Typography variant="h5" component="h2">
+          <Typography variant="h5" component="h2" sx={{ fontWeight: 600 }}>
             {editing ? "Edit Note" : "Add New Note"}
           </Typography>
           <IconButton onClick={onCancel}>
@@ -80,97 +77,64 @@ export default function NoteFormModal({open, editing, isLoading, onClose, onSubm
 
         <form onSubmit={handleSubmit(handleFormSubmit)}>
           <Stack spacing={3}>
-            {/* Title */}
-            <TextField
+            <RHFTextField
+              name="title"
+              control={control}
               label="Title"
-              {...register("title")}
-              error={!!errors.title}
-              helperText={errors.title?.message}
-              fullWidth
             />
 
-            {/* Category */}
-            <FormControl fullWidth error={!!errors.category}>
-              <InputLabel>Category</InputLabel>
-              <Select
-                label="Category"
-                {...register("category")}
-              >
-                {CATEGORY_OPTIONS.map(option => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
-                  </MenuItem>
-                ))}
-              </Select>
-              {errors.category && (
-                <Typography variant="caption" color="error">
-                  {errors.category.message}
-                </Typography>
-              )}
-            </FormControl>
+            <RHFSelect
+              name="category"
+              control={control}
+              label="Category"
+              options={CATEGORY_OPTIONS}
+            />
 
-            {/* Priority Radio Group */}
-            <FormControl component="fieldset" error={!!errors.priority}>
-              <FormLabel component="legend">Priority</FormLabel>
-              <RadioGroup row {...register("priority")}>
-                {PRIORITY_OPTIONS.map(option => (
-                  <FormControlLabel
-                    key={option.value}
-                    value={option.value}
-                    control={<Radio />}
-                    label={option.label}
-                  />
-                ))}
-              </RadioGroup>
-              {errors.priority && (
-                <Typography variant="caption" color="error">
-                  {errors.priority.message}
-                </Typography>
-              )}
-            </FormControl>
+            <RHFRadioGroup
+              name="priority"
+              control={control}
+              label="Priority"
+              options={PRIORITY_OPTIONS}
+            />
 
-            {/* Tags Checkbox Group */}
-            <FormControl component="fieldset">
-              <FormLabel component="legend">Tags</FormLabel>
-              <FormGroup row>
-                {TAG_OPTIONS.map(option => (
-                  <FormControlLabel
-                    key={option.value}
-                    control={
-                      <Checkbox
-                        checked={watch('tags').includes(option.value)}
-                        onChange={() => handleTagChange(option.value)}
-                      />
-                    }
-                    label={option.label}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
+            <RHFCheckboxGroup
+              name="tags"
+              control={control}
+              label="Tags"
+              options={TAG_OPTIONS}
+            />
 
-            {/* Content */}
-            <TextField
+            <RHFTextarea
+              name="content"
+              control={control}
               label="Content"
-              multiline
               rows={6}
-              {...register("content")}
-              error={!!errors.content}
-              helperText={errors.content?.message}
-              fullWidth
             />
 
-            <Box display="flex" gap={1} justifyContent="flex-end">
-              <Button 
-                variant="outlined" 
+            <Box display="flex" gap={1.5} justifyContent="flex-end" pt={2}>
+              <Button
+                variant="outlined"
                 onClick={onCancel}
                 disabled={isLoading}
+                sx={{
+                  borderRadius: 2,
+                  px: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
               >
                 Cancel
               </Button>
-              <Button 
-                type="submit" 
-                variant="contained" 
+              <Button
+                type="submit"
+                variant="contained"
                 disabled={isLoading || !isValid}
+                sx={{
+                  borderRadius: 2,
+                  px: 3,
+                  textTransform: 'none',
+                  fontWeight: 600,
+                }}
               >
                 {isLoading ? "Saving..." : editing ? "Update Note" : "Add Note"}
               </Button>

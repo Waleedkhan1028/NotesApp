@@ -38,8 +38,6 @@ export class NotesRepository {
     await dbConnect();
     return await Note.create({
       ...noteData,
-      createdAt: new Date(),
-      updatedAt: new Date(),
     });
   }
 
@@ -48,7 +46,7 @@ export class NotesRepository {
     await dbConnect();
     return await Note.findOneAndUpdate(
       { _id: id, userId },
-      { ...updateData, updatedAt: new Date() },
+      { ...updateData },
       { new: true, runValidators: true }
     );
   }
