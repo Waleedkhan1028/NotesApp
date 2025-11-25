@@ -1,36 +1,33 @@
 "use client";
 import React, { useState } from "react";
-import {Paper,Typography, Box, Button,IconButton,Chip,Alert,CircularProgress,Snackbar,} from "@mui/material";
+import { Paper, Typography, Box, Button, IconButton, Chip, Alert, CircularProgress } from "@mui/material";
 import { Delete, Edit, Add } from "@mui/icons-material";
 import Layout from "../../../styles/Layout";
-import { useForm, SubmitHandler } from "react-hook-form";
-import { useNotes,  useCreateNote,  useUpdateNote,  useDeleteNote, type Note,} from "../../api/ApiHooks/notes/index";
-import { noteSchema, NoteFormData } from "../../lib/schemas";
+import { SubmitHandler } from "react-hook-form";
+import { useNotes, useCreateNote, useUpdateNote, useDeleteNote, type Note } from "../../api/ApiHooks/notes/index";
+import { NoteFormData } from "../../lib/schemas";
 import NoteFormModal from "../../modules/notes/components/noteFormModal";
 import NoteDetailModal from "../../modules/notes/components/noteDetailModal";
 import { useSnackbar } from "../../context/SnackbarContext";
+
 export default function NotesPage() {
   const [editing, setEditing] = useState<string | null>(null);
   const [selectedNote, setSelectedNote] = useState<Note | null>(null);
   const [addModalOpen, setAddModalOpen] = useState(false);
-  
-  
-
 
   const { data: notes, isLoading: notesLoading, error: notesError, refetch } = useNotes();
   const createNote = useCreateNote();
   const updateNote = useUpdateNote();
   const deleteNote = useDeleteNote();
-    const { showSnackbar } = useSnackbar(); 
+  const { showSnackbar } = useSnackbar();
 
   const onSubmit: SubmitHandler<NoteFormData> = async (data) => {
     if (editing) {
-     
       updateNote.mutate(
         { id: editing, data },
         {
           onSuccess: (response: any) => {
-           showSnackbar(response.message || "Note updated successfully!", "success");
+            showSnackbar(response.message || "Note updated successfully!", "success");
             setEditing(null);
             setAddModalOpen(false);
           },
@@ -40,10 +37,9 @@ export default function NotesPage() {
         }
       );
     } else {
-     
       createNote.mutate(data, {
         onSuccess: (response: any) => {
-         showSnackbar(response.message || "Note created successfully!", "success");
+          showSnackbar(response.message || "Note created successfully!", "success");
           setAddModalOpen(false);
         },
         onError: (error: any) => {
@@ -60,8 +56,8 @@ export default function NotesPage() {
       onSuccess: () => {
         showSnackbar('Note deleted successfully!');
       },
-      onError: (error:any) => {
-          showSnackbar(error?.response?.data?.message || "Failed to delete note!", "error");
+      onError: (error: any) => {
+        showSnackbar(error?.response?.data?.message || "Failed to delete note!", "error");
       },
     });
   };
@@ -91,13 +87,11 @@ export default function NotesPage() {
     }
   };
 
-
   const isLoading = notesLoading || createNote.isPending || updateNote.isPending || deleteNote.isPending;
 
   return (
     <Layout>
-
-      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
         <Typography variant="h4">
           My Notes
         </Typography>
@@ -107,23 +101,22 @@ export default function NotesPage() {
           onClick={handleAddNew}
           disabled={isLoading}
           sx={{
-            borderRadius: 8,
+            borderRadius: 3,
             px: 3,
-            py: 1,
+            py: 1.2,
             textTransform: 'none',
             fontSize: '1rem',
-            fontWeight: 'bold',
+            fontWeight: 600,
           }}
         >
           Add Note
         </Button>
       </Box>
 
-    
       {notesError && (
-        <Alert 
-          severity="error" 
-          sx={{ mb: 2 }}
+        <Alert
+          severity="error"
+          sx={{ mb: 3, borderRadius: 2 }}
           action={
             <Button color="inherit" size="small" onClick={() => refetch()}>
               Retry
@@ -134,16 +127,22 @@ export default function NotesPage() {
         </Alert>
       )}
 
-     
       {notesLoading ? (
-        <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
+        <Box display="flex" justifyContent="center" alignItems="center" minHeight="300px">
           <CircularProgress />
         </Box>
       ) : (
         <>
           {!notes || notes.length === 0 ? (
-            <Paper sx={{ p: 3, textAlign: 'center' }}>
-              <Typography variant="h6" color="text.secondary">
+            <Paper
+              sx={{
+                p: 6,
+                textAlign: 'center',
+                background: 'rgba(255, 255, 255, 0.03)',
+                border: '2px dashed rgba(255, 255, 255, 0.1)',
+              }}
+            >
+              <Typography variant="h6" color="text.secondary" gutterBottom>
                 No notes yet.
               </Typography>
               <Typography variant="body2" color="text.secondary">
@@ -152,29 +151,46 @@ export default function NotesPage() {
             </Paper>
           ) : (
             notes.map((note) => (
-              <Paper key={note._id} sx={{ p: 3, mb: 2 }} >
-                <Box display="flex" justifyContent="space-between"  alignItems="flex-start">
-                  <Box flex={1} sx={{ cursor: 'pointer' }} onClick={() => setSelectedNote(note)}>
-                    <Box display="flex" alignItems="center" gap={1} mb={1}>
-                      <Typography variant="h6">{note.title}</Typography>
-                      <Chip 
-                        label={note.priority} 
-                        size="small" 
+              <Paper
+                key={note._id}
+                sx={{
+                  p: 3,
+                  mb: 2.5,
+                  transition: 'all 0.3s ease',
+                  cursor: 'pointer',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: '0 8px 24px rgba(144, 202, 249, 0.2)',
+                    background: 'rgba(255, 255, 255, 0.08)',
+                  },
+                }}
+              >
+                <Box display="flex" justifyContent="space-between" alignItems="flex-start">
+                  <Box flex={1} onClick={() => setSelectedNote(note)}>
+                    <Box display="flex" alignItems="center" gap={1} mb={1.5}>
+                      <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                        {note.title}
+                      </Typography>
+                      <Chip
+                        label={note.priority}
+                        size="small"
                         color={getPriorityColor(note.priority) as any}
+                        sx={{ fontWeight: 600 }}
                       />
-                      <Chip 
-                        label={note.category} 
-                        size="small" 
+                      <Chip
+                        label={note.category}
+                        size="small"
                         variant="outlined"
+                        sx={{ fontWeight: 500 }}
                       />
                     </Box>
-                    
-                    <Typography variant="body2" color="text.secondary" paragraph>
+
+                    <Typography variant="body2" color="text.secondary" paragraph sx={{ mb: 2 }}>
                       {note.content.length > 150 ? `${note.content.substring(0, 150)}...` : note.content}
                     </Typography>
 
                     {note.tags && note.tags.length > 0 && (
-                      <Box display="flex" gap={0.5} flexWrap="wrap" mb={1}>
+                      <Box display="flex" gap={0.5} flexWrap="wrap" mb={1.5}>
                         {note.tags.map(tag => (
                           <Chip key={tag} label={tag} size="small" variant="outlined" />
                         ))}
@@ -185,19 +201,29 @@ export default function NotesPage() {
                       Created: {new Date(note.createdAt).toLocaleString()}
                     </Typography>
                   </Box>
-                  
-                  <Box ml={2}>
-                    <IconButton 
+
+                  <Box ml={2} display="flex" gap={0.5}>
+                    <IconButton
                       onClick={() => handleEdit(note)}
                       color="primary"
                       disabled={isLoading}
+                      sx={{
+                        '&:hover': {
+                          background: 'rgba(144, 202, 249, 0.1)',
+                        },
+                      }}
                     >
                       <Edit />
                     </IconButton>
-                    <IconButton 
+                    <IconButton
                       onClick={() => handleDelete(note._id)}
                       color="error"
                       disabled={isLoading}
+                      sx={{
+                        '&:hover': {
+                          background: 'rgba(244, 67, 54, 0.1)',
+                        },
+                      }}
                     >
                       <Delete />
                     </IconButton>
@@ -209,7 +235,6 @@ export default function NotesPage() {
         </>
       )}
 
-     
       <NoteFormModal
         open={addModalOpen}
         editing={editing}
@@ -219,7 +244,6 @@ export default function NotesPage() {
         onCancel={handleCancel}
       />
 
-   
       <NoteDetailModal
         open={!!selectedNote}
         note={selectedNote}
@@ -228,9 +252,6 @@ export default function NotesPage() {
         onEdit={handleEdit}
         onDelete={handleDelete}
       />
-
- 
-
     </Layout>
   );
 }

@@ -9,8 +9,7 @@ interface LoginResponse {
   username: string;
   email: string;
   message: string;
- 
-  
+  user?: any;
 }
 
 export const useLogin = () => {

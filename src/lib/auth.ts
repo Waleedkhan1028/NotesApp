@@ -36,39 +36,4 @@ export async function verifyPassword(password: string, hashedPassword: string) {
 }
 
 
-export async function signupUser(username: string, password: string) {
-  
-  const existingUser = await User.findOne({ username });
-  if (existingUser) {
-    throw new Error("User already exists with this username");
-  }
 
- 
-  const hashedPassword = await hashPassword(password);
-
- 
-  const user = await User.create({
-    username,
-    password: hashedPassword,
-  });
-
- 
-  const token = generateToken(user._id.toString());
-  return { token, user };
-}
-
-
-export async function loginUser(username: string, password: string) {
-  const user = await User.findOne({ username });
-  if (!user) {
-    throw new Error("User not found");
-  }
-
-  const isMatch = await verifyPassword(password, user.password);
-  if (!isMatch) {
-    throw new Error("Invalid credentials");
-  }
-
-  const token = generateToken(user._id.toString());
-  return { token, user };
-}
